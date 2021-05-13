@@ -7,23 +7,30 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from keras.models import model_from_json
 from keras.utils import np_utils
+from skimage.color import rgb2gray
 import tensorflow as tf
+from PIL import Image
+import matplotlib.pyplot as plt
 import cv2
 import sys
 from netmodel import *
 from flask import *
 
 
-
 app = Flask(__name__)
 
-@app.route('/Check/<filepath>', methods=['GET'])
-def Check(filepath):
-    img = Imread(filepath)
+@app.route('/Check', methods=['POST'])
+def Check():
+    data = request.get_json(force=True)
+    filepath = data['filepath']
+    img = imread(filepath)
+    img = rgb2gray(img)
     img = resize(img, (28,28))
-    test_pred = model.predict(img)
+    img = img.reshape(-1,28,28,1)
+    test_pred = loaded_model.predict(img)
+    print(test_pred)
     test_pred = np.argmax(test_pred,1)
-    return test_pred
+    return str(test_pred)
 
 def trainingmodel(trainingdata):
     train = pd.read_csv(trainingdata)
