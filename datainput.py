@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 from skimage.io import imread
+from skimage.transform import resize
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from keras.models import model_from_json
@@ -19,7 +20,7 @@ app = Flask(__name__)
 @app.route('/Check/<filepath>', methods=['GET'])
 def Check(filepath):
     img = Imread(filepath)
-    print(type(img))
+    img = resize(img, (28,28))
     test_pred = model.predict(img)
     test_pred = np.argmax(test_pred,1)
     return test_pred
